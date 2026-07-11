@@ -1,15 +1,10 @@
 {
   "version": 2,
   "installCommand": "npm install --no-package-lock --prefix api && npm install --no-package-lock --prefix frontend",
-  "buildCommand": "cd frontend && npm run build && ls -la dist",
-  "functions": {
-    "api/server.js": {
-      "maxDuration": 60
-    }
-  },
+  "buildCommand": "cd frontend && npm install && npm run build && ls -la",
+  "outputDirectory": "frontend/dist",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/server" },
-    { "source": "/(.*)", "destination": "/frontend/dist/$1" },
-    { "source": "/", "destination": "/frontend/dist/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
