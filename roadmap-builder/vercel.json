@@ -1,15 +1,9 @@
 {
   "version": 2,
-  "installCommand": "cd roadmap-builder/api && npm install --no-package-lock && cd ../../roadmap-builder/frontend && npm install --no-package-lock",
-  "buildCommand": "cd roadmap-builder/frontend && npm run build",
-  "outputDirectory": "roadmap-builder/frontend/dist",
-  "functions": {
-    "roadmap-builder/api/server.js": {
-      "maxDuration": 60
-    }
-  },
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/roadmap-builder/api/server.js" },
-    { "source": "/(.*)", "destination": "/roadmap-builder/frontend/dist/index.html" }
+    { "source": "/api/(.*)", "destination": "/api/server.js" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
