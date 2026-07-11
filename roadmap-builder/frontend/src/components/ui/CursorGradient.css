@@ -1,0 +1,45 @@
+.cursor-trail-area {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.cursor-trail-dot {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    filter: blur(8px);
+    animation: fadeTrail 600ms ease-out forwards;
+}
+
+/* Dark mode: small magical cursor glow */
+[data-theme="dark"] .cursor-trail-dot {
+    background: rgba(168, 85, 247, 0.75);
+    box-shadow:
+            0 0 18px rgba(168, 85, 247, 0.55),
+            0 0 34px rgba(139, 92, 246, 0.35);
+}
+
+/* Light mode: softer and cleaner */
+[data-theme="light"] .cursor-trail-dot {
+    background: rgba(124, 58, 237, 0.22);
+    box-shadow:
+            0 0 14px rgba(124, 58, 237, 0.18),
+            0 0 24px rgba(168, 85, 247, 0.12);
+}
+
+@keyframes fadeTrail {
+    from {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.4);
+    }
+}

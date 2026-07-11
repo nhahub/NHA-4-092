@@ -1,0 +1,100 @@
+.focus-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 24px;
+}
+
+.focus-timer-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px;
+}
+
+.focus-circle {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: conic-gradient(
+            var(--primary) var(--focus-progress),
+            var(--surface) var(--focus-progress)
+    );
+}
+
+.focus-circle-inner {
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    background: var(--bg2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: 700;
+}
+
+.focus-message {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 20px;
+}
+
+.focus-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.focus-side-card {
+    margin-bottom: 16px;
+}
+
+.focus-section-title {
+    margin-bottom: 10px;
+}
+
+.focus-sound-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.focus-sound-button {
+    border: none;
+    cursor: pointer;
+}
+
+.focus-note {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 8px;
+}
+
+.focus-stats-title {
+    margin-bottom: 12px;
+}
+
+.focus-stat-grid {
+    grid-template-columns: 1fr 1fr;
+}
+
+.focus-total {
+    font-size: 12px;
+    color: var(--text3);
+    margin-top: 14px;
+}
+
+@media (max-width: 900px) {
+    .focus-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .focus-timer-card {
+        padding: 28px;
+    }
+}

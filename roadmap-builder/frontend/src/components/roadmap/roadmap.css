@@ -1,0 +1,119 @@
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.phase-item {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  align-items: center;
+  gap: 14px;
+  background: transparent;
+  border: none;
+  padding: 12px;
+  border-radius: var(--r12);
+  text-align: left;
+  color: var(--text2);
+  transition: background 0.2s;
+}
+.phase-item:hover {
+  background: var(--surface);
+}
+.phase-item.active {
+  background: var(--surface2);
+  box-shadow: inset 0 0 0 1px var(--border2);
+  color: var(--text);
+}
+
+.phase-node {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.phase-node--completed {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+}
+.phase-node--in-progress {
+  background: var(--gradient-brand);
+  color: #fff;
+  box-shadow: var(--glow-primary);
+}
+.phase-node--locked {
+  background: var(--surface);
+  color: var(--text3);
+  border: 1px solid var(--border);
+}
+
+.phase-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* MATERIAL CARDS - AI generated content */
+.materials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.material-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.material-explanation {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.material-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text3);
+  margin-bottom: 10px;
+}
+
+.topic-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0 8px 8px 0;
+}
+
+.resource-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text2);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.resource-item:last-child {
+  border-bottom: none;
+}
+.resource-item svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}

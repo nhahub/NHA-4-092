@@ -1,0 +1,10 @@
+# Secrets
+.env
+**/.env
+
+# IDE settings
+.idea/
+
+# Dependencies (Highly recommended since you have package.json files)
+node_modules/
+**/node_modules/

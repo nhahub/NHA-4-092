@@ -1,0 +1,8 @@
+[
+  { "name": "None", "icon": "/icons/none.svg", "sound": "" },
+  { "name": "Pink Noise", "icon": "/icons/lofi.svg", "sound": "/sounds/pink-noise.opus" },
+  { "name": "Rain", "icon": "/icons/rain.svg", "sound": "public/sounds/rain.opus" },
+  { "name": "White Noise", "icon": "/icons/white-noise.svg", "sound": "/sounds/white-noise.opus" },
+  { "name": "Forest", "icon": "/icons/forest.svg", "sound": "/sounds/forest.opus" },
+  { "name": "Sea Waves", "icon": "/icons/forest.svg", "sound": "/sounds/sea-waves.opus" }
+]

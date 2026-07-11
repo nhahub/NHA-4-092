@@ -1,0 +1,12 @@
+{
+  "name": "roadmap-builder",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RoadMap Builder - AI-powered learning roadmap platform",
+  "scripts": {
+    "install:all": "npm install --prefix api && npm install --prefix frontend",
+    "dev:api": "npm run dev --prefix api",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build": "npm install --prefix frontend && npm run build --prefix frontend"
+  }
+}
