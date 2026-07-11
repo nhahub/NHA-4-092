@@ -52,11 +52,12 @@ export default function Signup() {
           </div>
             <div className="form-group">
                 <label className="form-label">Gender</label>
-                
+
                 <select
                     value={gender}
                     onChange={(event) => setGender(event.target.value)}
                     required
+                    className="form-input"
                 >
                     <option value="prefer-not-to-say">Prefer not to say</option>
                     <option value="female">Female</option>
