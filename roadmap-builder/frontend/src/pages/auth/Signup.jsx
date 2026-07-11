@@ -52,6 +52,7 @@ export default function Signup() {
           </div>
             <div className="form-group">
                 <label className="form-label">Gender</label>
+                
                 <select
                     value={gender}
                     onChange={(event) => setGender(event.target.value)}
@@ -67,8 +68,10 @@ export default function Signup() {
             <div className="form-group">
                 <label className="form-label">Birthdate</label>
                 <input
+                    className="form-input"
                     type="date"
                     value={birthdate}
+                    max="2021-12-31"
                     onChange={(event) => setBirthdate(event.target.value)}
                     required
                 />
