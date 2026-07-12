@@ -1,0 +1,52 @@
+.rhodes-flip-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 18px;
+  border-radius: 999px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  box-shadow: var(--glow-secondary);
+  overflow: hidden;
+  vertical-align: middle;
+  white-space: nowrap;
+  transition: width 0.3s ease;
+}
+
+.rhodes-flip-word {
+  display: inline-block;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: rhodes-flip-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes rhodes-flip-in {
+  0% {
+    transform: translateY(65%);
+    opacity: 0;
+    filter: blur(4px);
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.rhodes-flip-measure {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  white-space: nowrap;
+  height: 0;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rhodes-flip-word {
+    animation: none;
+  }
+}

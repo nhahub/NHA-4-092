@@ -17,8 +17,8 @@ export default function AppLogo({ showText = true, size = 55 }) {
                         width={size}
                         height={size}
                         style={{
-                            objectFit: "cover",    // Fills the allocated width/height completely
-                            borderRadius: "50%",   // Crops the square background into a perfect circle
+                            objectFit: "cover",
+                            borderRadius: "50%",   // Changed to 50% to crop into a perfect circle
                             display: "block"       // Prevents weird inline-block spacing issues
                         }}
                         onError={() => setImgError(true)}

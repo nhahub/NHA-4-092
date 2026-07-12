@@ -89,6 +89,50 @@
     margin-top: 14px;
 }
 
+.focus-duration-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.focus-duration-input {
+    width: 64px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 6px 4px;
+    border-radius: 8px;
+    border: 1px solid var(--surface);
+    background: var(--bg2);
+    color: inherit;
+}
+
+.focus-duration-unit {
+    font-size: 13px;
+    color: var(--text2);
+}
+
+.focus-preset-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.focus-suggested-card {
+    grid-column: 1 / -1;
+}
+
+.focus-preset-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.focus-preset-button {
+    border: none;
+    cursor: pointer;
+}
+
 @media (max-width: 900px) {
     .focus-layout {
         grid-template-columns: 1fr;

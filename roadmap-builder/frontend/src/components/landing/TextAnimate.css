@@ -1,0 +1,26 @@
+.rhodes-text-animate {
+  display: inline;
+}
+
+.rhodes-ta-word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.5em);
+  filter: blur(3px);
+  transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease;
+}
+
+.rhodes-ta-word.rhodes-ta-in {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rhodes-ta-word {
+    transition: none;
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}

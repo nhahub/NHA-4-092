@@ -180,3 +180,17 @@ body {
     min-height: 100vh;
     z-index: 1;
 }
+.fade-in-route {
+    animation: fadeInRoute 0.45s ease both;
+}
+
+@keyframes fadeInRoute {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+

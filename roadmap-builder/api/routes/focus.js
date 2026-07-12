@@ -47,17 +47,23 @@ router.post("/session", async (req, res) => {
 
         const seconds = Number(req.body.seconds);
 
+        // Duration is now selectable on the frontend (25/30/45/50 min presets),
+        // so the client tells us what the session was set to run for.
+        // Falls back to the classic 25-minute session for older clients.
+        const duration = Number(req.body.duration) || FULL_SESSION_SECONDS;
+
         if (!seconds || seconds <= 0) {
             return res.status(400).json({
                 error: "Focus seconds are required.",
             });
         }
 
-        const completed = seconds >= FULL_SESSION_SECONDS;
+        const completed = seconds >= duration;
 
         await FocusSession.create({
             userId,
             seconds,
+            duration,
             completed,
         });
 
@@ -108,7 +114,8 @@ router.get("/stats", async (req, res) => {
             const seconds = Number(session.seconds || 0);
 
             const isCompleted =
-                session.completed === true || seconds >= FULL_SESSION_SECONDS;
+                session.completed === true ||
+                seconds >= (session.duration || FULL_SESSION_SECONDS);
 
             stats.startedSessions += 1;
             stats.seconds += seconds;

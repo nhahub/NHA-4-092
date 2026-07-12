@@ -18,10 +18,11 @@ export function AuthProvider({ children }) {
     return newUser;
   };
 
-  const logout = () => {
-    authService.logout();
-    setUser(null);
-  };
+    const logout = () => {
+        authService.logout();
+        window.location.replace("/");
+        setUser(null);
+    };
 
   return (
     <AuthContext.Provider value={{ user, login, signup, logout }}>

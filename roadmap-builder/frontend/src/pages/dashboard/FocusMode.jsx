@@ -5,7 +5,14 @@ import Button from "../../components/ui/Button";
 import { focusService } from "../../services/focusService";
 import "./FocusMode.css";
 
-const SESSION_SECONDS = 25 * 60;
+const DEFAULT_SESSION_SECONDS = 25 * 60;
+
+// Bounds for the custom duration input/stepper
+const MIN_MINUTES = 1;
+const MAX_MINUTES = 180;
+
+// Suggested Pomodoro durations shown at the bottom of the page (in minutes)
+const SUGGESTED_MINUTES = [25, 30, 45, 50];
 
 const emptyStats = {
     sessions: 0,
@@ -52,7 +59,9 @@ function prepareSound(sound) {
 }
 
 export default function FocusMode() {
-    const [secondsLeft, setSecondsLeft] = useState(SESSION_SECONDS);
+    // The currently selected timer duration (changes when a suggested time is picked)
+    const [sessionSeconds, setSessionSeconds] = useState(DEFAULT_SESSION_SECONDS);
+    const [secondsLeft, setSecondsLeft] = useState(DEFAULT_SESSION_SECONDS);
     const [running, setRunning] = useState(false);
     const [started, setStarted] = useState(false);
     const [sounds, setSounds] = useState([]);
@@ -63,7 +72,7 @@ export default function FocusMode() {
 
     const intervalRef = useRef(null);
     const audioRef = useRef(null);
-    const secondsLeftRef = useRef(SESSION_SECONDS);
+    const secondsLeftRef = useRef(DEFAULT_SESSION_SECONDS);
     const endingRef = useRef(false);
 
     useEffect(() => {
@@ -94,7 +103,7 @@ export default function FocusMode() {
 
     useEffect(() => {
         if (started && running && secondsLeft === 0) {
-            endSession();
+            endSession(true);
         }
     }, [secondsLeft, started, running]);
 
@@ -170,6 +179,48 @@ export default function FocusMode() {
         audioRef.current = null;
     }
 
+    // Resets the timer back to the current session length without saving progress
+    function resetTimer() {
+        clearInterval(intervalRef.current);
+        endingRef.current = false;
+
+        setRunning(false);
+        setStarted(false);
+        stopSound();
+
+        setSecondsLeft(sessionSeconds);
+        setSavedSeconds(0);
+        setMessage("");
+    }
+
+    // Sets a new timer length. Only meant to be used while the timer isn't
+    // running (inputs are disabled once a session starts), so it just updates
+    // the duration and the displayed clock directly.
+    function applyDuration(minutes) {
+        const clampedMinutes = Math.min(Math.max(minutes, MIN_MINUTES), MAX_MINUTES);
+        const newSeconds = clampedMinutes * 60;
+
+        setSessionSeconds(newSeconds);
+        setSecondsLeft(newSeconds);
+        setSavedSeconds(0);
+        setMessage("");
+    }
+
+    // Called when the user picks one of the Suggested Times presets
+    function choosePreset(minutes) {
+        applyDuration(minutes);
+    }
+
+    // Called when the user types directly into the custom duration input
+    function handleDurationInputChange(event) {
+        const value = parseInt(event.target.value, 10);
+
+        // Ignore incomplete typing (e.g. an empty field) until it's a real number
+        if (Number.isNaN(value)) return;
+
+        applyDuration(value);
+    }
+
     function startSession() {
         setMessage("");
         setSavedSeconds(0);
@@ -205,7 +256,9 @@ export default function FocusMode() {
         }
     }
 
-    async function endSession() {
+    // timedOut is true when the countdown reached 00:00 on its own,
+    // vs. the user pressing "End session" early
+    async function endSession(timedOut = false) {
         if (endingRef.current) return;
 
         endingRef.current = true;
@@ -214,15 +267,19 @@ export default function FocusMode() {
         setRunning(false);
         stopSound();
 
-        const elapsed = SESSION_SECONDS - secondsLeftRef.current;
+        const elapsed = sessionSeconds - secondsLeftRef.current;
 
         if (elapsed > 0) {
             try {
-                await focusService.saveSession(elapsed);
+                // Send the planned duration too, so the backend can tell whether
+                // this was a completed session (this may vary now that durations are selectable)
+                await focusService.saveSession(elapsed, sessionSeconds);
                 await loadStats();
 
                 setSavedSeconds(elapsed);
-                setMessage("Focus session saved.");
+                setMessage(
+                    timedOut ? "Time's up! Focus session complete." : "Focus session saved."
+                );
             } catch (error) {
                 console.error("Could not save focus session:", error);
                 setMessage("Session ended, but it could not be saved.");
@@ -230,15 +287,15 @@ export default function FocusMode() {
         }
 
         setStarted(false);
-        setSecondsLeft(SESSION_SECONDS);
+        setSecondsLeft(sessionSeconds);
 
         setTimeout(() => {
             endingRef.current = false;
         }, 0);
     }
 
-    const elapsedSeconds = SESSION_SECONDS - secondsLeft;
-    const percent = (elapsedSeconds / SESSION_SECONDS) * 100;
+    const elapsedSeconds = sessionSeconds - secondsLeft;
+    const percent = (elapsedSeconds / sessionSeconds) * 100;
 
     const today = todayKey();
     const todaySeconds = stats.daily?.[today] || 0;
@@ -270,6 +327,37 @@ export default function FocusMode() {
                             </div>
                         </div>
 
+                        {!started && (
+                            <div className="focus-duration-control">
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => applyDuration(sessionSeconds / 60 - 1)}
+                                    disabled={sessionSeconds / 60 <= MIN_MINUTES}
+                                >
+                                    −
+                                </Button>
+
+                                <input
+                                    type="number"
+                                    className="focus-duration-input"
+                                    min={MIN_MINUTES}
+                                    max={MAX_MINUTES}
+                                    value={sessionSeconds / 60}
+                                    onChange={handleDurationInputChange}
+                                />
+
+                                <span className="focus-duration-unit">min</span>
+
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => applyDuration(sessionSeconds / 60 + 1)}
+                                    disabled={sessionSeconds / 60 >= MAX_MINUTES}
+                                >
+                                    +
+                                </Button>
+                            </div>
+                        )}
+
                         <p className="focus-message">
                             {savedSeconds > 0
                                 ? `Saved ${Math.floor(savedSeconds / 60)} min ${savedSeconds % 60}s from your last session.`
@@ -286,8 +374,16 @@ export default function FocusMode() {
                             )}
 
                             <Button
+                                variant="secondary"
+                                onClick={resetTimer}
+                                disabled={!started && secondsLeft === sessionSeconds}
+                            >
+                                Reset
+                            </Button>
+
+                            <Button
                                 variant="danger"
-                                onClick={endSession}
+                                onClick={() => endSession(false)}
                                 disabled={!started}
                             >
                                 End session
@@ -347,6 +443,32 @@ export default function FocusMode() {
                             Total completed sessions: {stats.completedSessions || stats.sessions || 0} · Total time:{" "}
                             {(Number(stats.seconds || 0) / 3600).toFixed(1)}h
                         </div>
+                    </Card>
+                </div>
+
+                <div className="focus-suggested-card">
+                    <Card>
+                        <div className="material-section-title focus-section-title">
+                            Suggested Times
+                        </div>
+
+                        <div className="focus-preset-list">
+                            {SUGGESTED_MINUTES.map((minutes) => (
+                                <button
+                                    key={minutes}
+                                    type="button"
+                                    className={`chip-tag focus-preset-button${
+                                        sessionSeconds === minutes * 60 ? " active" : ""
+                                    }`}
+                                    onClick={() => choosePreset(minutes)}
+                                    disabled={started}
+                                >
+                                    {minutes} min
+                                </button>
+                            ))}
+                        </div>
+
+
                     </Card>
                 </div>
             </div>

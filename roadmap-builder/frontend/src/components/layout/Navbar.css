@@ -185,3 +185,15 @@
         right: -4px;
     }
 }
+.theme-toggle-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle-btn svg {
+    font-size: 15px;
+}

@@ -13,6 +13,8 @@ import {
     faRoad,
     faChartLine,
     faBullseye,
+    faMoon,
+    faSun,
 } from "@fortawesome/free-solid-svg-icons";
 import { roadmapService } from "../../services/roadmapService";
 import { useAuth } from "../../services/AuthContext";
@@ -20,18 +22,22 @@ import {
     getProfilePicture,
     readStoredProfile,
 } from "../../services/profilePicture";
+import AppLogo from "./AppLogo";
+import Button from "../ui/Button";
 import "./Navbar.css";
+
+const THEME_KEY = "rb_theme";
 
 const mobileLinks = [
     { label: "Roadmap", path: "/roadmap", icon: faRoad },
-    { label: "Progress", path: "/progress", icon: faChartLine },
+    { label: "Progress", path: "/dashboard", icon: faChartLine },
     { label: "Focus Mode", path: "/focus", icon: faBullseye },
     { label: "Achievements", path: "/achievements", icon: faTrophy },
     { label: "Profile", path: "/settings/profile", icon: faUser },
     { label: "Account Settings", path: "/settings/account", icon: faGear },
 ];
 
-export default function Navbar({ user }) {
+export default function Navbar({ user, variant }) {
     const { logout } = useAuth();
 
     const [menuOpen, setMenuOpen] = useState(false);
@@ -41,14 +47,34 @@ export default function Navbar({ user }) {
     const [notifications, setNotifications] = useState([]);
     const [profile, setProfile] = useState(readStoredProfile());
 
+    const [theme, setTheme] = useState(() => {
+        return localStorage.getItem(THEME_KEY) || "dark";
+    });
+
     const wrapperRef = useRef(null);
 
     const profilePicture = getProfilePicture(profile);
-    const unread = notifications.filter((n) => !n.read).length;
+    const unread = notifications.filter((notification) => !notification.read).length;
     const recent = notifications.slice(0, 5);
 
     useEffect(() => {
-        if (!user?.id) return;
+        document.documentElement.setAttribute("data-theme", theme);
+        document.body.setAttribute("data-theme", theme);
+
+        document.documentElement.classList.toggle("light", theme === "light");
+        document.documentElement.classList.toggle("dark", theme === "dark");
+
+        localStorage.setItem(THEME_KEY, theme);
+
+        window.dispatchEvent(
+            new CustomEvent("themeUpdated", {
+                detail: theme,
+            })
+        );
+    }, [theme]);
+
+    useEffect(() => {
+        if (!user?.id || variant === "landing") return;
 
         roadmapService
             .getForUser(user.id)
@@ -59,7 +85,7 @@ export default function Navbar({ user }) {
                 setNotifications(roadmap.notifications || []);
             })
             .catch(() => {});
-    }, [user?.id]);
+    }, [user?.id, variant]);
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -89,6 +115,32 @@ export default function Navbar({ user }) {
         };
     }, []);
 
+    function toggleTheme() {
+        setTheme((currentTheme) => {
+            return currentTheme === "dark" ? "light" : "dark";
+        });
+    }
+
+    function scrollToTop(event) {
+        if (event) {
+            event.preventDefault();
+        }
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
+    }
+
+    function handleLandingNavClick(event, id) {
+        event.preventDefault();
+
+        document.getElementById(id)?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+        });
+    }
+
     function openNotifications() {
         const shouldOpen = !notesOpen;
 
@@ -98,13 +150,15 @@ export default function Navbar({ user }) {
 
         if (!shouldOpen || !roadmapId) return;
 
-        const hasUnread = notifications.some((n) => !n.read);
+        const hasUnread = notifications.some((notification) => {
+            return !notification.read;
+        });
 
         if (!hasUnread) return;
 
         setNotifications(
-            notifications.map((n) => ({
-                ...n,
+            notifications.map((notification) => ({
+                ...notification,
                 read: true,
             }))
         );
@@ -135,19 +189,102 @@ export default function Navbar({ user }) {
     }
 
     function handleLogout() {
+        setMenuOpen(false);
         setMobileMenuOpen(false);
         logout();
     }
 
+    if (variant === "landing") {
+        return (
+            <header className="landing-nav">
+                <div className="landing-nav-inner">
+                    <Link to="/" className="landing-logo" onClick={scrollToTop}>
+                        <AppLogo />
+                    </Link>
+
+                    <nav className="landing-nav-links">
+                        <a
+                            href="#features"
+                            onClick={(event) =>
+                                handleLandingNavClick(event, "features")
+                            }
+                        >
+                            Features
+                        </a>
+
+                        <a
+                            href="#why"
+                            onClick={(event) =>
+                                handleLandingNavClick(event, "why")
+                            }
+                        >
+                            Why Rhodes
+                        </a>
+
+                        <a
+                            href="#how"
+                            onClick={(event) =>
+                                handleLandingNavClick(event, "how")
+                            }
+                        >
+                            How it works
+                        </a>
+                    </nav>
+
+                    <div className="landing-nav-actions">
+                        <button
+                            type="button"
+                            className="nav-btn theme-toggle-btn"
+                            aria-label="Toggle theme"
+                            onClick={toggleTheme}
+                        >
+                            <FontAwesomeIcon icon={theme === "dark" ? faSun : faMoon} />
+                        </button>
+
+                        <Link to="/login" className="landing-nav-login">
+                            Log in
+                        </Link>
+
+                        <Link to="/signup">
+                            <Button>Get started</Button>
+                        </Link>
+                    </div>
+                </div>
+            </header>
+        );
+    }
+
     return (
         <nav className="navbar" ref={wrapperRef}>
-            <Link to="/roadmap" className="navbar-logo">
-                <img src="/AppLogo.png" alt="Rhodes Logo" className="navbar-logo-img" />
+            <Link
+                to="/roadmap"
+                className="navbar-logo"
+                onClick={() => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                    });
+                }}
+            >
+                <img
+                    src="/AppLogo.png"
+                    alt="Rhodes Logo"
+                    className="navbar-logo-img"
+                />
 
                 <span className="navbar-logo-text">Rhodes</span>
             </Link>
 
             <div className="navbar-right">
+                <button
+                    className="nav-btn theme-toggle-btn"
+                    type="button"
+                    aria-label="Toggle theme"
+                    onClick={toggleTheme}
+                >
+                    <FontAwesomeIcon icon={theme === "dark" ? faSun : faMoon} />
+                </button>
+
                 <button
                     className="nav-btn notification-button"
                     type="button"
@@ -156,7 +293,9 @@ export default function Navbar({ user }) {
                 >
                     <FontAwesomeIcon icon={faBell} />
 
-                    {unread > 0 && <span className="notification-dot">{unread}</span>}
+                    {unread > 0 && (
+                        <span className="notification-dot">{unread}</span>
+                    )}
                 </button>
 
                 {notesOpen && (
@@ -178,7 +317,9 @@ export default function Navbar({ user }) {
 
                                     {notification.createdAt && (
                                         <small>
-                                            {new Date(notification.createdAt).toLocaleString()}
+                                            {new Date(
+                                                notification.createdAt
+                                            ).toLocaleString()}
                                         </small>
                                     )}
                                 </div>
@@ -191,8 +332,8 @@ export default function Navbar({ user }) {
                                 to="/notifications"
                                 onClick={() => setNotesOpen(false)}
                             >
-                                <FontAwesomeIcon icon={faClockRotateLeft} /> View notification
-                                history
+                                <FontAwesomeIcon icon={faClockRotateLeft} /> View
+                                notification history
                             </Link>
                         )}
                     </div>
@@ -237,19 +378,28 @@ export default function Navbar({ user }) {
                             <span>{user?.email}</span>
                         </div>
 
-                        <Link to="/settings/profile" onClick={() => setMenuOpen(false)}>
+                        <Link
+                            to="/settings/profile"
+                            onClick={() => setMenuOpen(false)}
+                        >
                             <FontAwesomeIcon icon={faUser} /> Profile
                         </Link>
 
-                        <Link to="/achievements" onClick={() => setMenuOpen(false)}>
+                        <Link
+                            to="/achievements"
+                            onClick={() => setMenuOpen(false)}
+                        >
                             <FontAwesomeIcon icon={faTrophy} /> Achievements
                         </Link>
 
-                        <Link to="/settings/account" onClick={() => setMenuOpen(false)}>
+                        <Link
+                            to="/settings/account"
+                            onClick={() => setMenuOpen(false)}
+                        >
                             <FontAwesomeIcon icon={faGear} /> Account settings
                         </Link>
 
-                        <button type="button" onClick={logout}>
+                        <button type="button" onClick={handleLogout}>
                             <FontAwesomeIcon icon={faRightFromBracket} /> Log out
                         </button>
                     </div>

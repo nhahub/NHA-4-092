@@ -28,7 +28,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="auth-shell">
+    <div className="auth-shell fade-page">
       <div className="orb1" />
       <div className="orb2" />
       <div className="auth-card">

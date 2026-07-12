@@ -26,7 +26,7 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-shell">
+    <div className="auth-shell ">
       <div className="orb1" />
       <div className="orb2" />
       <div className="auth-card">
